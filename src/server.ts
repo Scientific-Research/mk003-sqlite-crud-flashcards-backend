@@ -95,7 +95,13 @@ app.get("/currentuser", (req: express.Request, res: express.Response) => {
 
 app.get("/logout", (req, res) => {
   req.session.destroy((err) => {
-    res.send("User logged out");
+    // res.send("User logged out");
+    if (err) {
+      console.log(err);
+      res.send("ERROR");
+    } else {
+      res.send("logged out");
+    }
   });
 });
 
