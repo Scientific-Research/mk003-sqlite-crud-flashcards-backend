@@ -1,5 +1,5 @@
 import Database from "better-sqlite3";
-import { IFlashcard } from "./interface.js";
+import { IFlashcard } from "./interfaces.js";
 import * as tools from "./tools.js";
 
 import fs from "fs";
