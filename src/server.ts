@@ -109,18 +109,22 @@ app.get('/logout', (req, res) => {
 	});
 });
 
-app.delete('/flashcards/:id', (req: express.Request, res: express.Response) => {
-	const id = Number(req.params.id);
-	if (isNaN(id)) {
-		res.status(400).send({
-			error: true,
-			message: 'sent string, should be number',
-		});
-	} else {
-		const result = model.deleteFlashcard(id);
-		res.json(result);
+app.delete(
+	'/flashcards/:id',
+	authorizeUser,
+	(req: express.Request, res: express.Response) => {
+		const id = Number(req.params.id);
+		if (isNaN(id)) {
+			res.status(400).send({
+				error: true,
+				message: 'sent string, should be number',
+			});
+		} else {
+			const result = model.deleteFlashcard(id);
+			res.json(result);
+		}
 	}
-});
+);
 
 app.listen(port, () => {
 	console.log(`listening on port http://localhost:${port}`);

@@ -40,7 +40,7 @@ GET {{url}}/logout
 GET {{url}}/flashcards
 
 ### DELETE FLASHCARD
-DELETE {{url}}/flashcards/3000
+DELETE {{url}}/flashcards/2805
 
 ### DELETE BAD FLASHCARD
 DELETE {{url}}/flashcards/2erd
