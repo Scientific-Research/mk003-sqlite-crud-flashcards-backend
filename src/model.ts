@@ -25,10 +25,10 @@ export const saveWelcomeMessage = (welcomeMessage: string) => {
 export const getFlashcards = (): IFlashcard[] => {
   const stmt = db.prepare(
     `SELECT f.id,f.category,c.name as categoryName,f.front, f.back FROM flashcards AS f 
-		JOIN categories AS c ON f.category = c.iCode`
+		JOIN categories AS c ON f.category = c.idCode`
   );
 
-  const flashcards: IFlashcard[] = [];
+  const flashcards: any = [];
   for (let row of stmt.iterate()) {
     flashcards.push(row);
   }
