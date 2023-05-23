@@ -43,4 +43,4 @@ GET {{url}}/flashcards
 DELETE {{url}}/flashcards/2805
 
 ### DELETE BAD FLASHCARD
-DELETE {{url}}/flashcards/2erd
+DELETE {{url}}/flashcards/opuiopuiop
