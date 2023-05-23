@@ -19,7 +19,7 @@ app.use(
 	cors({
 		origin: ['http://localhost:3611'],
 		// methods: ["POST", "PUT", "GET", "OPTIONS", "HEAD"],
-		methods: ['POST', 'GET'],
+		methods: ['POST', 'GET', 'DELETE'],
 
 		credentials: true,
 	})
