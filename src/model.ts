@@ -36,7 +36,19 @@ export const getFlashcards = (): IFlashcard[] => {
 	return flashcards;
 };
 
-
+export const getFlashcard = (id: number): IFlashcard => {
+	const row: any = db
+		.prepare('SELECT * FROM flashcards WHERE id = ?')
+		.get(id);
+	if (row === undefined) {
+		return row;
+	} else {
+		const flashcard: IFlashcard = {
+			...row,
+		};
+		return flashcard;
+	}
+};
 
 export const deleteFlashcard = (id: number) => {
 	try {
