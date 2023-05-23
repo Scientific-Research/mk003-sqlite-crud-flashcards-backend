@@ -1,114 +1,127 @@
-import session from "express-session";
-import express from "express";
-import cors from "cors";
-import * as model from "./model.js";
-import dotenv from "dotenv";
-import cookieParser from "cookie-parser";
-import * as config from "./config.js";
+import session from 'express-session';
+import express from 'express';
+import cors from 'cors';
+import * as model from './model.js';
+import dotenv from 'dotenv';
+import cookieParser from 'cookie-parser';
+import * as config from './config.js';
 
-declare module "express-session" {
-  export interface SessionData {
-    user: { [key: string]: any };
-  }
+declare module 'express-session' {
+	export interface SessionData {
+		user: { [key: string]: any };
+	}
 }
 
 dotenv.config();
 
 const app = express();
 app.use(
-  cors({
-    origin: ["http://localhost:3611"],
-    // methods: ["POST", "PUT", "GET", "OPTIONS", "HEAD"],
-    methods: ["POST", "GET"],
+	cors({
+		origin: ['http://localhost:3611'],
+		// methods: ["POST", "PUT", "GET", "OPTIONS", "HEAD"],
+		methods: ['POST', 'GET'],
 
-    credentials: true,
-  })
+		credentials: true,
+	})
 );
 app.use(cookieParser());
 app.use(express.json());
 const port = config.port;
 
 app.use(
-  session({
-    resave: true,
-    saveUninitialized: true,
-    secret: process.env.SESSION_SECRET,
-    cookie: {
-      httpOnly: true,
-      sameSite: "lax",
-      secure: false,
-    },
-  })
+	session({
+		resave: true,
+		saveUninitialized: true,
+		secret: process.env.SESSION_SECRET,
+		cookie: {
+			httpOnly: true,
+			sameSite: 'lax',
+			secure: false,
+		},
+	})
 );
 
 const authorizeUser = (
-  req: express.Request,
-  res: express.Response,
-  next: express.NextFunction
+	req: express.Request,
+	res: express.Response,
+	next: express.NextFunction
 ) => {
-  if (req.session.user === ("admin" as any)) {
-    next();
-  } else {
-    res.status(401).send({});
-  }
+	if (req.session.user === ('admin' as any)) {
+		next();
+	} else {
+		res.status(401).send({});
+	}
 };
 
-app.get("/flashcards", (req: express.Request, res: express.Response) => {
-  res.json(model.getFlashcards());
+app.get('/flashcards', (req: express.Request, res: express.Response) => {
+	res.json(model.getFlashcards());
 });
 
-app.get("/", (req: express.Request, res: express.Response) => {
-  res.send(model.getApiInstructions());
+app.get('/', (req: express.Request, res: express.Response) => {
+	res.send(model.getApiInstructions());
 });
 
-app.get("/welcomemessage", (req: express.Request, res: express.Response) => {
-  res.send(model.getWelcomeMessage());
+app.get('/welcomemessage', (req: express.Request, res: express.Response) => {
+	res.send(model.getWelcomeMessage());
 });
 
 app.post(
-  "/welcomemessage",
-  authorizeUser,
-  (req: express.Request, res: express.Response) => {
-    const { welcomeMessage } = req.body;
-    model.saveWelcomeMessage(welcomeMessage);
-    res.send({});
-  }
+	'/welcomemessage',
+	authorizeUser,
+	(req: express.Request, res: express.Response) => {
+		const { welcomeMessage } = req.body;
+		model.saveWelcomeMessage(welcomeMessage);
+		res.send({});
+	}
 );
 
-app.post("/login", (req: express.Request, res: express.Response) => {
-  const password = req.body.password;
-  if (password === process.env.ADMIN_PASSWORD) {
-    req.session.user = "admin" as any;
-    req.session.cookie.expires = new Date(
-      Date.now() + config.secondsTillTimeout * 1000
-    );
-    req.session.save();
-    res.send("ok");
-  } else {
-    res.status(401).send({});
-  }
+app.post('/login', (req: express.Request, res: express.Response) => {
+	const password = req.body.password;
+	if (password === process.env.ADMIN_PASSWORD) {
+		req.session.user = 'admin' as any;
+		req.session.cookie.expires = new Date(
+			Date.now() + config.secondsTillTimeout * 1000
+		);
+		req.session.save();
+		res.send('ok');
+	} else {
+		res.status(401).send({});
+	}
 });
 
-app.get("/currentuser", (req: express.Request, res: express.Response) => {
-  if (req.session.user) {
-    res.send(req.session.user);
-  } else {
-    res.status(403).send({});
-  }
+app.get('/currentuser', (req: express.Request, res: express.Response) => {
+	if (req.session.user) {
+		res.send(req.session.user);
+	} else {
+		res.status(403).send({});
+	}
 });
 
-app.get("/logout", (req, res) => {
-  req.session.destroy((err) => {
-    // res.send("User logged out");
-    if (err) {
-      console.log(err);
-      res.send("ERROR");
-    } else {
-      res.send("logged out");
-    }
-  });
+app.get('/logout', (req, res) => {
+	req.session.destroy((err) => {
+		// res.send("User logged out");
+		if (err) {
+			console.log(err);
+			res.send('ERROR');
+		} else {
+			res.send('logged out');
+		}
+	});
+});
+
+app.delete('/flashcards/:id', (req: express.Request, res: express.Response) => {
+	const id = Number(req.params.id);
+	if (isNaN(id)) {
+		res.status(400).send({
+			error: true,
+			message: 'sent string, should be number',
+		});
+	} else {
+		const result = model.deleteFlashcards(id);
+		res.json(result);
+	}
 });
 
 app.listen(port, () => {
-  console.log(`listening on port http://localhost:${port}`);
+	console.log(`listening on port http://localhost:${port}`);
 });
