@@ -1,8 +1,12 @@
 import Database from "better-sqlite3";
 import { IFlashcard } from "./interfaces.js";
 import * as tools from "./tools.js";
-
 import fs from "fs";
+
+const dbAbsolutePathAndFileName =
+  tools.absolutifyPathAndFileName("src/data/db.sqlite");
+const db = new Database(dbAbsolutePathAndFileName);
+db.pragma(`journal_mode = wal`);
 
 const welcomeMessagePathAndFileName = "./src/data/welcomeMessage.txt";
 
