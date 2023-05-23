@@ -1,19 +1,38 @@
-import fs from 'fs';
+import Database from "better-sqlite3";
+import { IFlashcard } from "./interface.js";
+import * as tools from "./tools.js";
 
-const welcomeMessagePathAndFileName = './src/data/welcomeMessage.txt';
+import fs from "fs";
+
+const welcomeMessagePathAndFileName = "./src/data/welcomeMessage.txt";
 
 export const getWelcomeMessage = () => {
-	const welcomeMessage = fs.readFileSync(welcomeMessagePathAndFileName,
-		{ encoding: 'utf8', flag: 'r' });
-	return welcomeMessage;
-}
+  const welcomeMessage = fs.readFileSync(welcomeMessagePathAndFileName, {
+    encoding: "utf8",
+    flag: "r",
+  });
+  return welcomeMessage;
+};
 
 export const saveWelcomeMessage = (welcomeMessage: string) => {
-	fs.writeFileSync(welcomeMessagePathAndFileName, welcomeMessage);
-}
+  fs.writeFileSync(welcomeMessagePathAndFileName, welcomeMessage);
+};
+
+export const getFlashcards = (): IFlashcard[] => {
+  const stmt = db.prepare(
+    `SELECT f.id,f.category,c.name as categoryName,f.front, f.back FROM flashcards AS f 
+		JOIN categories AS c ON f.category = c.iCode`
+  );
+
+  const flashcards: IFlashcard[] = [];
+  for (let row of stmt.iterate()) {
+    flashcards.push(row);
+  }
+  return flashcards;
+};
 
 export const getApiInstructions = () => {
-	return `
+  return `
 <style>
 	body {
 		background-color: #444;
@@ -33,4 +52,4 @@ export const getApiInstructions = () => {
 	<li><a href="/test">/test</a> - shows date/time as test</li>
 </ul>
 	`;
-}
+};
