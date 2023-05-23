@@ -38,3 +38,6 @@ GET {{url}}/logout
 
 ### GET FLASHCARDS
 GET {{url}}/flashcards
+
+### DELETE FLASHCARD
+DELETE {{url}}/flashcards/3000
