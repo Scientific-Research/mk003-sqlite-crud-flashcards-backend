@@ -117,7 +117,7 @@ app.delete('/flashcards/:id', (req: express.Request, res: express.Response) => {
 			message: 'sent string, should be number',
 		});
 	} else {
-		const result = model.deleteFlashcards(id);
+		const result = model.deleteFlashcard(id);
 		res.json(result);
 	}
 });

@@ -1,42 +1,69 @@
-import Database from "better-sqlite3";
-import { IFlashcard } from "./interfaces.js";
-import * as tools from "./tools.js";
-import fs from "fs";
+import Database from 'better-sqlite3';
+import { IFlashcard } from './interfaces.js';
+import * as tools from './tools.js';
+import * as model from './model.js';
+import fs from 'fs';
 
 const dbAbsolutePathAndFileName =
-  tools.absolutifyPathAndFileName("src/data/db.sqlite");
+	tools.absolutifyPathAndFileName('src/data/db.sqlite');
 const db = new Database(dbAbsolutePathAndFileName);
 db.pragma(`journal_mode = wal`);
 
-const welcomeMessagePathAndFileName = "./src/data/welcomeMessage.txt";
+const welcomeMessagePathAndFileName = './src/data/welcomeMessage.txt';
 
 export const getWelcomeMessage = () => {
-  const welcomeMessage = fs.readFileSync(welcomeMessagePathAndFileName, {
-    encoding: "utf8",
-    flag: "r",
-  });
-  return welcomeMessage;
+	const welcomeMessage = fs.readFileSync(welcomeMessagePathAndFileName, {
+		encoding: 'utf8',
+		flag: 'r',
+	});
+	return welcomeMessage;
 };
 
 export const saveWelcomeMessage = (welcomeMessage: string) => {
-  fs.writeFileSync(welcomeMessagePathAndFileName, welcomeMessage);
+	fs.writeFileSync(welcomeMessagePathAndFileName, welcomeMessage);
 };
 
 export const getFlashcards = (): IFlashcard[] => {
-  const stmt = db.prepare(
-    `SELECT f.id,f.category,c.name as categoryName,f.front, f.back FROM flashcards AS f 
+	const stmt = db.prepare(
+		`SELECT f.id,f.category,c.name as categoryName,f.front, f.back FROM flashcards AS f 
 		JOIN categories AS c ON f.category = c.idCode`
-  );
+	);
 
-  const flashcards: any = [];
-  for (let row of stmt.iterate()) {
-    flashcards.push(row);
-  }
-  return flashcards;
+	const flashcards: any = [];
+	for (let row of stmt.iterate()) {
+		flashcards.push(row);
+	}
+	return flashcards;
+};
+
+
+
+export const deleteFlashcard = (id: number) => {
+	try {
+		const formerFlashcard = model.getFlashcard(id);
+		const stmt = db.prepare(`DELETE FROM flashcards WHERE id = ?`);
+		const result = stmt.run(id);
+		if (result.changes === 1) {
+			return {
+				status: 'success',
+				deletedFlashcard: formerFlashcard,
+			};
+		} else {
+			return {
+				status: 'error',
+				message: `database changes = ${result.changes}`,
+			};
+		}
+	} catch (e) {
+		return {
+			status: 'error',
+			message: e.message,
+		};
+	}
 };
 
 export const getApiInstructions = () => {
-  return `
+	return `
 <style>
 	body {
 		background-color: #444;
